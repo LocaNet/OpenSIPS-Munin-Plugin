@@ -1,0 +1,28 @@
+Munin plugin to monitor OpenSIPS
+Copyright (C) 2011 Henning Holtschneider, LocaNet oHG
+<henning@loca.net>
+
+Overview
+--------
+
+This script provides a plugin for the Munin networked monitoring tool to 
+gather data from an OpenSIPS server. It does so by reading status 
+information via 'opensipsctl fifo get_statistics'.
+
+Installation
+------------
+
+1. Copy the file opensips_ to your Munin plugin directory
+
+2. (Optional) adjust the effective user and group the plugin runs as by placing
+   something
+
+  [opensips_*]
+  user opensips
+  group opensips
+  
+  to your munin-node.conf
+  
+3. run munin-node-configure --suggest --shell and create the required symlinks
+
+4. restart munin-node

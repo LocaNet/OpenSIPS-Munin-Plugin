@@ -1,0 +1,160 @@
+#!/bin/bash
+#
+#   Munin plugin to monitor OpenSIPS
+#   Copyright (C) 2011 Henning Holtschneider, LocaNet oHG, <henning@loca.net>
+#
+#    This program is free software: you can redistribute it and/or modify
+#    it under the terms of the GNU General Public License as published by
+#    the Free Software Foundation, either version 3 of the License, or
+#    (at your option) any later version.
+#
+#    This program is distributed in the hope that it will be useful,
+#    but WITHOUT ANY WARRANTY; without even the implied warranty of
+#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#    GNU General Public License for more details.
+#
+#    You should have received a copy of the GNU General Public License
+#    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+#
+#%# family=auto
+#%# capabilities=autoconf suggest
+
+OPENSIPS_CMD="/usr/sbin/opensipsctl"
+
+OPENSIPS_MODULE=$(basename $0 | sed 's/^opensips_//g')
+
+if [ "$1" = "autoconf" ]; then
+	if [ -x ${OPENSIPS_CMD} ]; then
+		echo yes
+		exit 0
+	else
+		echo "no (${OPENSIPS_CMD} not found)"
+		exit 1
+	fi
+fi
+
+if [ "$1" = "suggest" ]; then
+	${OPENSIPS_CMD} fifo get_statistics all | sed -e 's/^\([^:]*\):\(.*\) = \(.*\)/\1/g' | uniq | grep -v sl
+	exit 0
+fi
+
+if [ "$1" = "config" ]; then
+
+	echo "graph_category OpenSIPS"
+
+	case ${OPENSIPS_MODULE} in
+	
+		core)
+			echo "graph_title OpenSIPS core"
+			echo "graph_vlabel requests"
+			echo "rcv_req.label received requests"
+			echo "rcv_repl.label received replies"
+			echo "fwd_req.label forwarded requests"
+			echo "fwd_repl.label forwarded replies"
+			echo "drop_req.label dropped requests"
+			echo "drop_repl.label dropped replies"
+			echo "err_req.label request errors"
+			echo "err_repl.label reply errors"
+			exit 0;;
+			
+		shmem)
+			echo "graph_title OpenSIPS memory pool"
+			echo "graph_vlabel bytes"
+			echo "total.label total"
+			echo "used.label used"
+			exit 0;;
+
+		tm)
+			echo "graph_title OpenSIPS transactions"
+			echo "graph_vlabel transactions"
+			echo "total.label total"
+			echo "2xx.label 2xx transactions"
+			echo "3xx.label 3xx transactions"
+			echo "4xx.label 4xx transactions"
+			echo "5xx.label 5xx transactions"
+			echo "6xx.label 6xx transactions"
+			echo "current.label current"
+			exit 0;;
+
+		usrloc)
+			echo "graph_title OpenSIPS registered users"
+			echo "graph_vlabel users"
+			echo "total.label total"
+			echo "location.label locations"
+			exit 0;;
+
+		registrar)
+			echo "graph_title OpenSIPS registrar"
+			echo "graph_vlabel registrations"
+			echo "accepted.label accepted"
+			echo "rejected.label rejected"
+			exit 0;;
+
+		dialog)
+			echo "graph_title OpenSIPS SIP dialogs"
+			echo "graph_vlabel bytes"
+			echo "total.label total"
+			echo "active.label active"
+			exit 0;;
+			
+		*)
+			# unknown
+			exit 1;;
+
+	esac
+fi
+
+if [ "0${OPENSIPS_MODULE}" = "0" ]; then
+	exit 1
+fi
+
+$(${OPENSIPS_CMD} fifo get_statistics ${OPENSIPS_MODULE}: | sed -e 's/-/_/g' | sed -e 's/^\([^:]*\):\(.*\) = \(.*\)/let \1_\2=\3/g')
+
+case ${OPENSIPS_MODULE} in
+
+	core)
+		echo "rcv_req.value ${core_rcv_requests}"
+		echo "rcv_repl.value ${core_rcv_replies}"
+		echo "fwd_req.value ${core_fwd_requests}"
+		echo "fwd_repl.value ${core_fwd_replies}"
+		echo "drop_req.value ${core_drop_requests}"
+		echo "drop_repl.value ${core_drop_replies}"
+		echo "err_req.value ${core_err_requests}"
+		echo "err_repl.value ${core_err_replies}"
+		exit 0;;
+		
+	shmem)
+		echo "total.value ${shmem_total_size}"
+		echo "used.value ${shmem_used_size}"
+		exit 0;;
+		
+	tm)
+		echo "total.value ${tm_UAS_transactions}"
+		echo "2xx.value ${tm_2xx_transactions}"
+		echo "3xx.value ${tm_3xx_transactions}"
+		echo "4xx.value ${tm_4xx_transactions}"
+		echo "5xx.value ${tm_5xx_transactions}"
+		echo "6xx.value ${tm_6xx_transactions}"
+		echo "current.value ${tm_inuse_transactions}"
+		exit 0;;
+
+	usrloc)
+		echo "total.value ${usrloc_registered_users}"
+		echo "location.value ${usrloc_location_contacts}"
+		exit 0;;
+
+	registrar)
+		echo "accepted.value ${registrar_accepted_regs}"
+		echo "rejected.value ${registrar_rejected_regs}"
+		exit 0;;
+		
+	dialog)
+		echo "total.value ${dialog_processed_dialogs}"
+		echo "active.value ${dialog_active_dialogs}"
+		exit 0;;
+		
+	*)
+		# unknown
+		exit 1;;
+
+esac

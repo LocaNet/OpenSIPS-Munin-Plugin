@@ -47,14 +47,23 @@ if [ "$1" = "config" ]; then
 		core)
 			echo "graph_title OpenSIPS core"
 			echo "graph_vlabel requests"
+			echo "graph_args --base 1000"
 			echo "rcv_req.label received requests"
+			echo "rcv_req.type COUNTER"
 			echo "rcv_repl.label received replies"
+			echo "rcv_repl.type COUNTER"
 			echo "fwd_req.label forwarded requests"
+			echo "fwd_req.type COUNTER"
 			echo "fwd_repl.label forwarded replies"
+			echo "fwd_repl.type COUNTER"
 			echo "drop_req.label dropped requests"
+			echo "drop_req.type COUNTER"
 			echo "drop_repl.label dropped replies"
+			echo "drop_repl.type COUNTER"
 			echo "err_req.label request errors"
+			echo "err_req.type COUNTER"
 			echo "err_repl.label reply errors"
+			echo "err_repl.type COUNTER"
 			exit 0;;
 			
 		shmem)
@@ -67,18 +76,26 @@ if [ "$1" = "config" ]; then
 		tm)
 			echo "graph_title OpenSIPS transactions"
 			echo "graph_vlabel transactions"
+			echo "graph_args --base 1000"
 			echo "total.label total"
+			echo "total.type COUNTER"
 			echo "2xx.label 2xx transactions"
+			echo "2xx.type COUNTER"
 			echo "3xx.label 3xx transactions"
+			echo "3xx.type COUNTER"
 			echo "4xx.label 4xx transactions"
+			echo "4xx.type COUNTER"
 			echo "5xx.label 5xx transactions"
+			echo "5xx.type COUNTER"
 			echo "6xx.label 6xx transactions"
+			echo "6xx.type COUNTER"
 			echo "current.label current"
 			exit 0;;
 
 		usrloc)
 			echo "graph_title OpenSIPS registered users"
 			echo "graph_vlabel users"
+			echo "graph_args --base 1000"
 			echo "total.label total"
 			echo "location.label locations"
 			exit 0;;
@@ -86,14 +103,19 @@ if [ "$1" = "config" ]; then
 		registrar)
 			echo "graph_title OpenSIPS registrar"
 			echo "graph_vlabel registrations"
+			echo "graph_args --base 1000"
 			echo "accepted.label accepted"
+			echo "accepted.type COUNTER"
 			echo "rejected.label rejected"
+			echo "rejected.type COUNTER"
 			exit 0;;
 
 		dialog)
 			echo "graph_title OpenSIPS SIP dialogs"
-			echo "graph_vlabel bytes"
+			echo "graph_vlabel dialogs"
+			echo "graph_args --base 1000"
 			echo "total.label total"
+			echo "total.type COUNTER"
 			echo "active.label active"
 			exit 0;;
 			
